@@ -19,29 +19,67 @@ Students:
 Currently this project has no licence - this will change in the future.
 
 
-# CAVE / BEWARE:
+## CAVE / BEWARE:
 this projects uses lab parameters that are familiar to german physicians in clinical practice and therefore are not always proper si-units!
 
-### Lab Data (input)
+#### Lab Data (input)
 comma-separated-values (csv) are read from a file.
 
 ```{r echo=FALSE, results='asis'}
 library(knitr)
-kable(read.csv("./input_data_structures/lab-Lab results input data structure.csv", header = TRUE, sep = ";"))
+kable(read.csv2("./input_data_structures/lab-Lab results input data structure.csv"))
 ```
 
-### Lookup table for patient-data
+#### Lookup table for patient-data
 comma-separated-values (csv) are read from a file.
 
 ```{r echo=FALSE, results='asis'}
 library(knitr)
-kable(read.csv("./input_data_structures/patient_lookup-patient data lookup table structure sheet.csv", header = TRUE, sep = ";"))
+kable(read.csv2("./input_data_structures/patient_lookup-patient data lookup table structure sheet.csv"))
 ```
 
-### Normal values
+#### Normal values
 comma-separated-values (csv) are read from a file.
+Source: http://www.laborlexikon.de/Referenzen.htm
 
 ```{r echo=FALSE, results='asis'}
 library(knitr)
-kable(read.csv("./input_data_structures/norm-Lab results input data structure.csv", header = TRUE, sep = ";"))
+kable(read.csv2("./input_data_structures/norm-Lab results input data structure.csv"))
 ```
+
+
+### Random Datasets
+```{r}
+library(lubridate)
+normvalues <- read.csv2("./input_data_structures/norm-Lab results input data structure.csv")
+
+store <- list()
+v <- numeric(14)
+k <- 0
+
+for (i in 1:40) {
+  for (j in 1:20) {
+    k <- k+1
+    v[1] <- i # resultId
+    v[2] <- j # patientId
+    v[3] <- now() - runif(1, 0, 10^8) # Unix Timestamp magic
+    v[4] <- runif(1, 120.0, 155.0) # na
+    v[5] <- runif(1, 2.0, 10.5) # k
+    v[6] <- runif(1, 0.2, 10.0) # krea
+    v[7] <- runif(1, 10.0, 80.0) # hst
+    v[8] <- runif(1, 0, 250) # gfr
+    v[9] <- runif(1, 2.0, 18.0) # hgb
+    v[10] <- runif(1, 2.0, 6.0) # rbc
+    v[11] <- runif(1, 4000, 2*10^6) # plt
+    v[12] <- runif(1, 100, 40000) # wbc
+    v[13] <- runif(1, 0.1, 5.0) # inr
+    v[14] <- runif(1, 15, 80) # ptt
+    
+    store[[k]] <- v
+  }
+}
+
+write.csv2(store, "./dummyValues.csv")
+
+```
+
