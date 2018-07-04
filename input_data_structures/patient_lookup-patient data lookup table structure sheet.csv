@@ -1,0 +1,4 @@
+Parameter;Data Type
+patientId;Integer
+sex;Boolean [m/f]
+age;Integer

@@ -1,0 +1,12 @@
+Parameter;Unit;female min;female max;male min;male max
+na;[mmol/l];135;145;135;145
+k;[mmol/l];3.8;5.2;3.8;5.2
+krea;[mg/dl];0.66;1.09;0.81;1.44
+hst;[mg/dl];21;43;18;55
+gfr;[ml/min];0;999;0;999
+hgb;[g/dl];12;16;14;18
+rbc;[10^6/µl] ;4.3;5.2;4.8;5.9
+plt;[/µl] ;150000;400000;150000;400000
+wbc;[/µl] ;4000;10000;4000;10000
+inr;no dimension;0.85;1.27;0.85;1.27
+ptt;[sec];20;38;20;38

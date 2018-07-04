@@ -1,0 +1,15 @@
+Parameter;Data Type;Unit
+resultId;Integer;no dimension
+patientId;Integer;no dimension
+date;Timestamp;(YYYY-MM-DD-HH-MM)
+na;Floating point;[mmol/l]
+k;Floating point;[mmol/l]
+krea;Floating point;[mg/dl]
+hst;Floating point;[mg/dl]
+gfr;Integer;[ml/min]
+hgb;Floating point;[g/dl]
+rbc;Integer;[10^6/µl] 
+plt;Integer;[/µl] 
+wbc;Floating point;[/µl] 
+inr;Floating point;no dimension
+ptt;Floating point;[sec]

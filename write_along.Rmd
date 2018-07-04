@@ -1,0 +1,47 @@
+---
+title: "shinyLabView docs"
+output:
+  html_document:
+    df_print: paged
+---
+
+(assorted write-along during programming)
+
+# What?
+This is a Shiny web app to visualize lab results from csv input data.
+This is a study-project from "Beuth University of Apllied Sciences (https://www.beuth-hochschule.de)
+
+Students: 
+* Semra Kocack
+* Christopher Secker
+* Markus Bockhacker
+
+Currently this project has no licence - this will change in the future.
+
+
+# CAVE / BEWARE:
+this projects uses lab parameters that are familiar to german physicians in clinical practice and therefore are not always proper si-units!
+
+### Lab Data (input)
+comma-separated-values (csv) are read from a file.
+
+```{r echo=FALSE, results='asis'}
+library(knitr)
+kable(read.csv("./input_data_structures/lab-Lab results input data structure.csv", header = TRUE, sep = ";"))
+```
+
+### Lookup table for patient-data
+comma-separated-values (csv) are read from a file.
+
+```{r echo=FALSE, results='asis'}
+library(knitr)
+kable(read.csv("./input_data_structures/patient_lookup-patient data lookup table structure sheet.csv", header = TRUE, sep = ";"))
+```
+
+### Normal values
+comma-separated-values (csv) are read from a file.
+
+```{r echo=FALSE, results='asis'}
+library(knitr)
+kable(read.csv("./input_data_structures/norm-Lab results input data structure.csv", header = TRUE, sep = ";"))
+```
