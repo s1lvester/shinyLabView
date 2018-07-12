@@ -60,7 +60,7 @@ k <- 0
 for (i in 1:40) {
   for (j in 1:20) {
     k <- k+1
-    v[1] <- i # resultId
+    v[1] <- k # resultId
     v[2] <- j # patientId
     v[3] <- now() - runif(1, 0, 10^8) # Unix Timestamp magic
     v[4] <- runif(1, 120.0, 155.0) # na
@@ -79,7 +79,10 @@ for (i in 1:40) {
   }
 }
 
-write.csv2(store, "./dummyValues.csv")
+store <- as.data.frame(do.call("rbind", store))
+store <- round(store, digits=2)
+colnames(store) <- c("resultId", "patientId", "date", "na", "k", "krea", "hst", "gfr", "hgb", "rbc", "plt", "wbc", "inr", "ptt") 
 
+write.csv2(store, "./dummyValues.csv")
 ```
 

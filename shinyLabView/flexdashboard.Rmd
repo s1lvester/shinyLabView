@@ -1,0 +1,24 @@
+---
+title: "ShinyLabView"
+output: 
+  flexdashboard::flex_dashboard:
+runtime: shiny
+---
+
+```{r global, include=FALSE}
+library(DT)
+labData <- read.csv2("./dummyValues.csv")
+```
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+```{r}
+selectInput("patId", label = "Patient ID",
+            choices = labData$patientId)
+```
+
+Column
+-----------------------------------------------------------------------
+```{r}
+renderDataTable(labData[labData$patientId == input$patId, ])
+```
