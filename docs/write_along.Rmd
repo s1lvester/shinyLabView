@@ -86,3 +86,13 @@ colnames(store) <- c("resultId", "patientId", "date", "na", "k", "krea", "hst", 
 write.csv2(store, "./dummyValues.csv")
 ```
 
+## "internal API"
+In order to build a modular program there's need for an internal api or convention on how to call testcases.
+Testcases can either reverence the whole dataset or a subset by patientId and/or date.
+
+Pseudocode:
+
+    function testCase1 (dataSet, patientId, timeStamdFrom, timeStampTo) {
+      ...
+      return message String "result"
+    }
