@@ -7,7 +7,7 @@ runtime: shiny
 
 ```{r global, include=FALSE}
 library(DT)
-labData <- read.csv2("./dummyValues.csv")
+labData <- read.csv2("../dummyValues.csv")
 ```
 
 Column {.sidebar}
