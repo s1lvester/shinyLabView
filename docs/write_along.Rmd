@@ -80,7 +80,6 @@ for (i in 1:40) {
 }
 
 store <- as.data.frame(do.call("rbind", store))
-store <- round(store, digits=2)
 colnames(store) <- c("resultId", "patientId", "date", "na", "k", "krea", "hst", "gfr", "hgb", "rbc", "plt", "wbc", "inr", "ptt") 
 
 write.csv2(store, "./dummyValues.csv")
