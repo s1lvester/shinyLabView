@@ -6,11 +6,13 @@ runtime: shiny
 ---
 
 ```{r global, include=FALSE}
+library(data.table)
 library(DT)
-labData <- read.csv2("../dummyValues.csv")
+library(lubridate)
+labData <- read.csv("../dummyValues.csv") # loading labData in global needs to be done only once.
 ```
 
-Column {.sidebar}
+Inputs {.sidebar}
 -----------------------------------------------------------------------
 ```{r}
 selectInput("patId", label = "Patient ID",
@@ -20,5 +22,18 @@ selectInput("patId", label = "Patient ID",
 Column
 -----------------------------------------------------------------------
 ```{r}
-renderDataTable(labData[labData$patientId == input$patId, ])
+labData$date <- as_datetime(labData$date) # convert unixTs to human readable string
+displayData <- reactive({ # build a reactive component
+  displayData <- labData[labData$patientId == input$patId, ] # select by patientId
+  displayData <- displayData[order(displayData$date, decreasing = TRUE), ] # sort by date
+  displayData <- subset(displayData, select = c(date, na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt)) # select Values to display
+})
+
+DT::renderDataTable(
+  datatable( # I'm using a seperate datatable-obj. to enable formatRounding.
+    data = displayData(),
+    rownames = FALSE
+  )
+  %>% formatRound(c(2:22), 2)
+)
 ```
