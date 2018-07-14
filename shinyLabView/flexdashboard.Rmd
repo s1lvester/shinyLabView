@@ -9,7 +9,7 @@ runtime: shiny
 library(data.table)
 library(DT)
 library(lubridate)
-labData <- read.csv("../dummyValues.csv") # loading labData in global needs to be done only once.
+labData <- read.csv("./dummyValues.csv") # loading labData in global needs to be done only once.
 ```
 
 Inputs {.sidebar}
