@@ -9,30 +9,34 @@ runtime: shiny
 library(data.table)
 library(DT)
 library(lubridate)
-labData <- read.csv("./dummyValues.csv") # loading labData in global needs to be done only once.
+labData <- read.csv("./dummyValues.csv") # loading data in global needs to be done only once.
 patData <- read.csv2("./patientData.csv")
+combinedData <- merge(labData, patData, by = "patientId")
 ```
 
 Inputs {.sidebar}
 -----------------------------------------------------------------------
 ```{r}
-selectInput("patId", label = "Patient ID",
-            choices = labData$patientId)
+selectInput("patId", label = "Patient",
+            choices = combinedData$patientId)
 ```
 
 Column
 -----------------------------------------------------------------------
 ```{r}
-labData$date <- as_datetime(labData$date, origin = lubridate::origin, tz = "UTC") # convert int to unixTs-obj.
-labData$date <- format(labData$date, format = "%Y-%m-%d, %H:%M") # convert unixTs to human readable string
+combinedData$date <- as_datetime(combinedData$date, 
+                                 origin = lubridate::origin, 
+                                 tz = "UTC") # convert int to unixTs-obj.
+combinedData$date <- format(combinedData$date, 
+                            format = "%Y-%m-%d, %H:%M") # convert unixTs to human readable string
 
 displayData <- reactive({ # build a reactive component
-  displayData <- labData[labData$patientId == input$patId, ] # select by patientId
+  displayData <- combinedData[combinedData$patientId == input$patId, ] # select by patientId
   displayData <- displayData[order(displayData$date, decreasing = TRUE), ] # sort by date
   displayData <- subset(displayData, select = c(date, na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt)) 
 })
 
-DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html & https://rstudio.github.io/DT/shiny.html
+DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
   datatable( # I'm using a seperate datatable-obj. to enable formatRounding.
     data = displayData(),
     rownames = FALSE
