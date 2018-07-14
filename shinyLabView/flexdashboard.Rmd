@@ -22,7 +22,8 @@ selectInput("patId", label = "Patient ID",
 Column
 -----------------------------------------------------------------------
 ```{r}
-labData$date <- as_datetime(labData$date) # convert unixTs to human readable string
+labData$date <- as_datetime(labData$date, origin = lubridate::origin, tz = "UTC") # convert int to unixTs-obj.
+labData$date <- format(labData$date, format = "%Y-%m-%d, %H:%M") # convert unixTs to human readable string
 displayData <- reactive({ # build a reactive component
   displayData <- labData[labData$patientId == input$patId, ] # select by patientId
   displayData <- displayData[order(displayData$date, decreasing = TRUE), ] # sort by date
