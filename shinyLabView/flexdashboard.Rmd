@@ -29,11 +29,11 @@ displayData <- reactive({ # build a reactive component
   displayData <- subset(displayData, select = c(date, na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt)) # select Values to display
 })
 
-DT::renderDataTable(
+DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html & https://rstudio.github.io/DT/shiny.html
   datatable( # I'm using a seperate datatable-obj. to enable formatRounding.
     data = displayData(),
     rownames = FALSE
   )
-  %>% formatRound(c(2:22), 2)
+  %>% formatRound(c(2:22), 2) # see: https://stackoverflow.com/questions/33171279/dt-in-shiny-and-r-custom-number-formatting
 )
 ```
