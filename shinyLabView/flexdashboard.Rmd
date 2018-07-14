@@ -14,11 +14,21 @@ patData <- read.csv2("./patientData.csv")
 combinedData <- merge(labData, patData, by = "patientId")
 ```
 
-Inputs {.sidebar}
+Sidebar {.sidebar}
 -----------------------------------------------------------------------
 ```{r}
+# prepare patient selection with helper vector:
+# - selectInput takes a named vector to display names coded with an id:
+#   See: http://shiny.rstudio.com/reference/shiny/latest/selectInput.html
+#   and: https://www.dummies.com/programming/r/how-to-name-the-values-in-your-vectors-in-r/
+patData<- patData[order(patData$name), ]
+patSelectors <- patData$patientId
+names(patSelectors) <- paste(as.character(patData$name), 
+                             as.character(patData$firstName),
+                             sep = ", ")
+
 selectInput("patId", label = "Patient",
-            choices = combinedData$patientId)
+            choices = patSelectors)
 ```
 
 Column
