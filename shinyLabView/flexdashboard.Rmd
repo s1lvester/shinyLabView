@@ -10,6 +10,7 @@ library(data.table)
 library(DT)
 library(lubridate)
 labData <- read.csv("./dummyValues.csv") # loading labData in global needs to be done only once.
+patData <- read.csv2("./patientData.csv")
 ```
 
 Inputs {.sidebar}
@@ -24,10 +25,11 @@ Column
 ```{r}
 labData$date <- as_datetime(labData$date, origin = lubridate::origin, tz = "UTC") # convert int to unixTs-obj.
 labData$date <- format(labData$date, format = "%Y-%m-%d, %H:%M") # convert unixTs to human readable string
+
 displayData <- reactive({ # build a reactive component
   displayData <- labData[labData$patientId == input$patId, ] # select by patientId
   displayData <- displayData[order(displayData$date, decreasing = TRUE), ] # sort by date
-  displayData <- subset(displayData, select = c(date, na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt)) # select Values to display
+  displayData <- subset(displayData, select = c(date, na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt)) 
 })
 
 DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html & https://rstudio.github.io/DT/shiny.html
