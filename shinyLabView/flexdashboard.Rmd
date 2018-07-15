@@ -2,6 +2,8 @@
 title: "ShinyLabView"
 output: 
   flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
 runtime: shiny
 ---
 
@@ -14,8 +16,8 @@ patData <- read.csv2("./patientData.csv")
 combinedData <- merge(labData, patData, by = "patientId")
 ```
 
-Sidebar {.sidebar}
------------------------------------------------------------------------
+Inputs {.sidebar}
+=======================================================================
 ```{r}
 # prepare patient selection with helper vector:
 # - selectInput takes a named vector to display names coded with an id:
@@ -31,8 +33,8 @@ selectInput("patId", label = "Patient",
             choices = patSelectors)
 ```
 
-Column
------------------------------------------------------------------------
+Lab Results
+=======================================================================
 ```{r}
 combinedData$date <- as_datetime(combinedData$date, 
                                  origin = lubridate::origin, 
@@ -52,7 +54,11 @@ DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
   datatable( # using a seperate datatable-obj. to enable formatRounding.
     data = displayData(),
     class = "white-space: nowrap", # disable linebreaks: https://github.com/rstudio/DT/issues/353#issuecomment-244509696
-    options = list(ordering = FALSE) # ordering makes no sense in a turned table
+    options = list(ordering = FALSE, # ordering makes no sense in a turned table
+                   paging = FALSE, # display all avail rows on one site (no problem since table is transposed)
+                   searching = FALSE, # disable searchbar
+                   bInfo = FALSE, # disable "Showing .. of .. Values"
+                   scrollX = TRUE) # enable horizontal scolling
   )
   %>% formatRound(c(1:999), 2) # see: https://stackoverflow.com/questions/33171279/dt-in-shiny-and-r-custom-number-formatting
 )
