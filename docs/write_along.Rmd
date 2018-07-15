@@ -4,13 +4,14 @@ author: Markus Bockhacker
 output: github_document
 ---
 
-(assorted write-along during programming)
-
 # What?
-This is a Shiny web app to visualize lab results from csv input data.
-This is a study-project from "Beuth University of Apllied Sciences (https://www.beuth-hochschule.de)
 
-Students: 
+* This is a Shiny web app to visualize lab results from csv input data.
+* This is a study-project from "Beuth University of Apllied Sciences (https://www.beuth-hochschule.de)
+* This file is an assorted write-along during programming.
+
+Students involved in the project: 
+
 * Semra Kocack
 * Christopher Secker
 * Markus Bockhacker
@@ -21,9 +22,10 @@ Currently this project has no licence - this will change in the future.
 ## CAVE / BEWARE:
 this projects uses lab parameters that are familiar to german physicians in clinical practice and therefore are not always proper si-units!
 
-#### Lab Data (input)
+## Input Data
 comma-separated-values (csv) are read from a file.
 
+#### Lab data
 ```{r echo=FALSE, results='asis'}
 library(knitr)
 kable(read.csv2("./input_data_structures/lab-Lab results input data structure.csv"))
@@ -47,7 +49,7 @@ kable(read.csv2("./input_data_structures/norm-Lab results input data structure.c
 ```
 
 
-### Random Datasets
+### Random Datasets to create lab data
 ```{r}
 library(lubridate)
 

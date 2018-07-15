@@ -2,14 +2,18 @@ shinyLabView docs
 ================
 Markus Bockhacker
 
-(assorted write-along during programming)
-
 What?
 =====
 
-This is a Shiny web app to visualize lab results from csv input data. This is a study-project from "Beuth University of Apllied Sciences (<https://www.beuth-hochschule.de>)
+-   This is a Shiny web app to visualize lab results from csv input data.
+-   This is a study-project from "Beuth University of Apllied Sciences (<https://www.beuth-hochschule.de>)
+-   This file is an assorted write-along during programming.
 
-Students: \* Semra Kocack \* Christopher Secker \* Markus Bockhacker
+Students involved in the project:
+
+-   Semra Kocack
+-   Christopher Secker
+-   Markus Bockhacker
 
 Currently this project has no licence - this will change in the future.
 
@@ -18,9 +22,12 @@ CAVE / BEWARE:
 
 this projects uses lab parameters that are familiar to german physicians in clinical practice and therefore are not always proper si-units!
 
-#### Lab Data (input)
+Input Data
+----------
 
 comma-separated-values (csv) are read from a file.
+
+#### Lab data
 
 | Parameter | Data.Type      | Unit               |
 |:----------|:---------------|:-------------------|
@@ -69,7 +76,7 @@ comma-separated-values (csv) are read from a file. Source: <http://www.laborlexi
 | inr       |        |        0.85|        1.27|      0.85|      1.27|
 | ptt       | sec    |       20.00|       38.00|     20.00|     38.00|
 
-### Random Datasets
+### Random Datasets to create lab data
 
 ``` r
 library(lubridate)
