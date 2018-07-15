@@ -55,19 +55,19 @@ comma-separated-values (csv) are read from a file.
 
 comma-separated-values (csv) are read from a file. Source: <http://www.laborlexikon.de/Referenzen.htm>
 
-| Parameter |  female.min|  female.max|  male.min|  male.max|
-|:----------|-----------:|-----------:|---------:|---------:|
-| na        |    1.35e+02|    1.45e+02|  1.35e+02|  1.45e+02|
-| k         |    3.80e+00|    5.20e+00|  3.80e+00|  5.20e+00|
-| krea      |    6.60e-01|    1.09e+00|  8.10e-01|  1.44e+00|
-| hst       |    2.10e+01|    4.30e+01|  1.80e+01|  5.50e+01|
-| gfr       |    0.00e+00|    9.99e+02|  0.00e+00|  9.99e+02|
-| hgb       |    1.20e+01|    1.60e+01|  1.40e+01|  1.80e+01|
-| rbc       |    4.30e+00|    5.20e+00|  4.80e+00|  5.90e+00|
-| plt       |    1.50e+05|    4.00e+05|  1.50e+05|  4.00e+05|
-| wbc       |    4.00e+03|    1.00e+04|  4.00e+03|  1.00e+04|
-| inr       |    8.50e-01|    1.27e+00|  8.50e-01|  1.27e+00|
-| ptt       |    2.00e+01|    3.80e+01|  2.00e+01|  3.80e+01|
+| parameter | unit   |  female.min|  female.max|  male.min|  male.max|
+|:----------|:-------|-----------:|-----------:|---------:|---------:|
+| na        | mmol/l |      135.00|      145.00|    135.00|    145.00|
+| k         | mmol/l |        3.80|        5.20|      3.80|      5.20|
+| krea      | mg/dl  |        0.66|        1.09|      0.81|      1.44|
+| hst       | mg/dl  |       21.00|       43.00|     18.00|     55.00|
+| gfr       | ml/min |        0.00|      999.00|      0.00|    999.00|
+| hgb       | g/dl   |       12.00|       16.00|     14.00|     18.00|
+| rbc       | mio/ul |        4.30|        5.20|      4.80|      5.90|
+| plt       | tsd/ul |      150.00|      400.00|    150.00|    400.00|
+| wbc       | tsd/ul |        4.00|       10.00|      4.00|     10.00|
+| inr       |        |        0.85|        1.27|      0.85|      1.27|
+| ptt       | sec    |       20.00|       38.00|     20.00|     38.00|
 
 ### Random Datasets
 
@@ -83,8 +83,6 @@ library(lubridate)
     ##     date
 
 ``` r
-normvalues <- read.csv2("./input_data_structures/norm-Lab results input data structure.csv")
-
 store <- list()
 v <- numeric(14)
 k <- 0
@@ -102,8 +100,8 @@ for (i in 1:40) {
     v[8] <- runif(1, 0, 250) # gfr
     v[9] <- runif(1, 2.0, 18.0) # hgb
     v[10] <- runif(1, 2.0, 6.0) # rbc
-    v[11] <- runif(1, 4000, 2*10^6) # plt
-    v[12] <- runif(1, 100, 40000) # wbc
+    v[11] <- runif(1, 20, 1000) # plt
+    v[12] <- runif(1, 0.1, 42) # wbc
     v[13] <- runif(1, 0.1, 5.0) # inr
     v[14] <- runif(1, 15, 80) # ptt
     
@@ -114,7 +112,7 @@ for (i in 1:40) {
 store <- as.data.frame(do.call("rbind", store))
 colnames(store) <- c("resultId", "patientId", "date", "na", "k", "krea", "hst", "gfr", "hgb", "rbc", "plt", "wbc", "inr", "ptt") 
 
-write.csv2(store, "../shinyLabView/dummyValues.csv")
+write.csv(store, "../shinyLabView/labData.csv")
 ```
 
 "internal API"

@@ -7,14 +7,29 @@ runtime: shiny
 ---
 
 ```{r global, include=FALSE}
-library(data.table)
 library(dplyr)
-library(DT)
 library(lubridate)
+library(DT)
 labData <- read.csv("./labData.csv") # loading data in global needs to be done only once.
 patData <- read.csv2("./patientData.csv")
 normValues <- read.csv2("./normValues.csv")
 combinedData <- merge(labData, patData, by = "patientId")
+
+# build normvalues for display later
+femaleNormValues <- c()
+maleNormValues <- c()
+for (i in 1:nrow(normValues)) {
+  femaleNormValues <- c(femaleNormValues, paste(as.character(normValues[i, "female.min"]),
+                                                "-",
+                                                as.character(normValues[i, "female.max"]),
+                                                as.character(normValues[i, "unit"]))
+                        )
+  maleNormValues <- c(maleNormValues, paste(as.character(normValues[i, "male.min"]),
+                                            "-",
+                                            as.character(normValues[i, "male.max"]),
+                                            as.character(normValues[i, "unit"]))
+                      )
+}
 ```
 
 Lab Results {data-orientation=rows}
@@ -50,8 +65,9 @@ h4(renderText({
         as.character(patData[patData$patientId == input$patId, "sex"]),
         ")",
         "age:",
-        as.character(patData[patData$patientId == input$patId, "age"]) )
+        as.character(patData[patData$patientId == input$patId, "age"]))
 }))
+
 # "prettify" data for output
 combinedData$date <- as_datetime(combinedData$date, 
                                  origin = lubridate::origin, 
@@ -60,15 +76,24 @@ combinedData$date <- format(combinedData$date,
                             format = "%y-%m-%d %H:%M") # convert unixTs to human readable string
 # round to reasonable values (using dplyr)
 combinedData <- mutate_at(combinedData, vars(na, k, krea, hst), funs(round(., 2)))
-combinedData <- mutate_at(combinedData, vars(gfr, hgb, inr), funs(round(., 1)))
-combinedData <- mutate_at(combinedData, vars(gfr, rbc, plt, wbc, ptt), funs(round(., 0)))
+combinedData <- mutate_at(combinedData, vars(gfr, hgb, inr, rbc, wbc), funs(round(., 1)))
+combinedData <- mutate_at(combinedData, vars(gfr, plt, ptt), funs(round(., 0)))
 
 # build a reactive component for DT
 displayData <- reactive({ 
   displayData <- combinedData[combinedData$patientId == input$patId, ] # select by patientId
   displayData <- displayData[order(displayData$date, decreasing = TRUE), ] # sort by date
   rownames(displayData) <- displayData$date # set date as rowname (can't be done earlier, because of likely duplicates)
-  displayData <- subset(displayData, select = c(na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt))
+  displayData <- subset(displayData, select = c(na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt)) # select values (if not done here normValues will be false!)
+  
+  # Bind sex-specific normValues to table
+  if (patData[patData$patientId == input$patId, "sex"] == "f") {
+    displayData <- rbind(femaleNormValues, displayData)
+  } else {
+    displayData <- rbind(maleNormValues, displayData)
+  }
+  rownames(displayData) <- c("norm", rownames(displayData)[-1]) # replace default rowname
+  
   displayData <- t(displayData) # transpose table (in order to get that sweet "Kummulativbericht-feeling")
 })
 
@@ -83,13 +108,10 @@ DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
                    searching = FALSE, # disable searchbar
                    bInfo = FALSE, # disable "Showing .. of .. Values"
                    scrollX = TRUE, # enable horizontal scolling
-                   fixedColumns = TRUE, # fix first column
-                   autoWidth = TRUE, # (https://github.com/rstudio/DT/issues/29#issuecomment-85222039)
-                   columnDefs = list(list(width = "60px", 
-                                          targets = 0)
-                                     )
-                   )
+                   fixedColumns = list(leftColumns = 2), # fix columns
+                   autoWidth = TRUE) # (https://github.com/rstudio/DT/issues/29#issuecomment-85222039)
   )
-  %>% formatStyle(0, backgroundColor = "lightgrey", fontWeight = "bold") # style first row
+  %>% formatStyle(0, backgroundColor = "lightgrey", fontWeight = "bold") # style column
+  %>% formatStyle(1, backgroundColor = "lightgrey", fontSize = "xx-small")
 )
 ```

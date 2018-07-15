@@ -50,7 +50,6 @@ kable(read.csv2("./input_data_structures/norm-Lab results input data structure.c
 ### Random Datasets
 ```{r}
 library(lubridate)
-normvalues <- read.csv2("./input_data_structures/norm-Lab results input data structure.csv")
 
 store <- list()
 v <- numeric(14)
@@ -69,8 +68,8 @@ for (i in 1:40) {
     v[8] <- runif(1, 0, 250) # gfr
     v[9] <- runif(1, 2.0, 18.0) # hgb
     v[10] <- runif(1, 2.0, 6.0) # rbc
-    v[11] <- runif(1, 4000, 2*10^6) # plt
-    v[12] <- runif(1, 100, 40000) # wbc
+    v[11] <- runif(1, 20, 1000) # plt
+    v[12] <- runif(1, 0.1, 42) # wbc
     v[13] <- runif(1, 0.1, 5.0) # inr
     v[14] <- runif(1, 15, 80) # ptt
     
@@ -81,7 +80,7 @@ for (i in 1:40) {
 store <- as.data.frame(do.call("rbind", store))
 colnames(store) <- c("resultId", "patientId", "date", "na", "k", "krea", "hst", "gfr", "hgb", "rbc", "plt", "wbc", "inr", "ptt") 
 
-write.csv2(store, "../shinyLabView/dummyValues.csv")
+write.csv(store, "../shinyLabView/labData.csv")
 ```
 
 ## "internal API"
