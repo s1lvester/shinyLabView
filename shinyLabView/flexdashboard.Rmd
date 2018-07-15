@@ -38,19 +38,22 @@ combinedData$date <- as_datetime(combinedData$date,
                                  origin = lubridate::origin, 
                                  tz = "UTC") # convert int to unixTs-obj.
 combinedData$date <- format(combinedData$date, 
-                            format = "%Y-%m-%d, %H:%M") # convert unixTs to human readable string
+                            format = "%y-%m-%d %H:%M") # convert unixTs to human readable string
 
 displayData <- reactive({ # build a reactive component
   displayData <- combinedData[combinedData$patientId == input$patId, ] # select by patientId
   displayData <- displayData[order(displayData$date, decreasing = TRUE), ] # sort by date
-  displayData <- subset(displayData, select = c(date, na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt)) 
+  rownames(displayData) <- displayData$date # set date as rowname (can't be done earlier, because of likely duplicates)
+  displayData <- subset(displayData, select = c(na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt))
+  displayData <- t(displayData) # transpose table (in order to get that sweet "Kummulativbericht-feeling")
 })
 
 DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
-  datatable( # I'm using a seperate datatable-obj. to enable formatRounding.
+  datatable( # using a seperate datatable-obj. to enable formatRounding.
     data = displayData(),
-    rownames = FALSE
+    class = "white-space: nowrap", # disable linebreaks: https://github.com/rstudio/DT/issues/353#issuecomment-244509696
+    options = list(ordering = FALSE) # ordering makes no sense in a turned table
   )
-  %>% formatRound(c(2:22), 2) # see: https://stackoverflow.com/questions/33171279/dt-in-shiny-and-r-custom-number-formatting
+  %>% formatRound(c(1:999), 2) # see: https://stackoverflow.com/questions/33171279/dt-in-shiny-and-r-custom-number-formatting
 )
 ```
