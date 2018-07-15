@@ -12,8 +12,9 @@ library(data.table)
 library(dplyr)
 library(DT)
 library(lubridate)
-labData <- read.csv("./dummyValues.csv") # loading data in global needs to be done only once.
+labData <- read.csv("./labData.csv") # loading data in global needs to be done only once.
 patData <- read.csv2("./patientData.csv")
+normValues <- read.csv2("./normValues.csv")
 combinedData <- merge(labData, patData, by = "patientId")
 ```
 
