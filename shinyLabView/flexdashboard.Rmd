@@ -2,12 +2,7 @@
 title: "ShinyLabView"
 output: 
   flexdashboard::flex_dashboard:
-<<<<<<< Updated upstream
-    orientation: columns
-    vertical_layout: fill
-=======
     theme: sandstone
->>>>>>> Stashed changes
 runtime: shiny
 ---
 
