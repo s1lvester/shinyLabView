@@ -126,3 +126,14 @@ Pseudocode:
       ...
       return MessageString "result"
     }
+
+datatables.net and DT
+---------------------
+
+DI is a R Interface to the jQuery Plug-in DataTables (<https://rstudio.github.io/DT>).
+
+#### Selection and FixedColumns
+
+Selection of rows doesn't really work with FixedColumns (<https://github.com/rstudio/DT/issues/275#issuecomment-355610296>). Instead I disabled click-enents via css for fixed table-columns via `pointerEvents = "none"`.
+
+aka: terrible hack.

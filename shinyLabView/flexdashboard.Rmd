@@ -102,7 +102,8 @@ DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
   datatable( # using a seperate datatable-obj. to enable formatStyle
     data = displayData(),
     class = "white-space: nowrap", # disable linebreaks: https://github.com/rstudio/DT/issues/353#issuecomment-244509696
-    extensions = "FixedColumns",
+    extensions = c("FixedColumns"),
+    selection = list(mode = "single", target = "row"), # https://rstudio.github.io/DT/shiny.html
     options = list(ordering = FALSE, # ordering makes no sense in a turned table
                    paging = FALSE, # display all avail rows on one site (no problem since table is transposed)
                    searching = FALSE, # disable searchbar
@@ -110,8 +111,9 @@ DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
                    scrollX = TRUE, # enable horizontal scolling
                    fixedColumns = list(leftColumns = 2), # fix columns
                    autoWidth = TRUE) # (https://github.com/rstudio/DT/issues/29#issuecomment-85222039)
-  )
-  %>% formatStyle(0, backgroundColor = "lightgrey", fontWeight = "bold") # style column
-  %>% formatStyle(1, backgroundColor = "lightgrey", fontSize = "xx-small")
+  ) 
+  # style Columns
+  %>% formatStyle(0, backgroundColor = "lightgrey", fontWeight = "bold", pointerEvents = "none") # see write_along.Rmd regarding pointerEvents = "none"
+  %>% formatStyle(1, backgroundColor = "lightgrey", fontSize = "xx-small", pointerEvents = "none")
 )
 ```
