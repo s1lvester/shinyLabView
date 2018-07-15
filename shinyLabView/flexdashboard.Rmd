@@ -17,8 +17,11 @@ normValues <- read.csv2("./normValues.csv")
 combinedData <- merge(labData, patData, by = "patientId")
 ```
 
-Inputs {.sidebar}
+Lab Results {data-orientation=rows}
 =======================================================================
+
+Column {.sidebar}
+-----------------------------------------------------------------------
 ```{r}
 # prepare patient selection with helper vector:
 # - selectInput takes a named vector to display names coded with an id:
@@ -34,28 +37,20 @@ selectInput("patId", label = "Patient",
             choices = patSelectors)
 ```
 
-Lab Results {data-orientation=rows}
-=======================================================================
-
 Row
 -----------------------------------------------------------------------
-### Patient-Data
+### Lab results
 ```{r}
-renderText({
-  paste(as.character(patData[patData$patientId == input$patId, "firstName"]),
+h4(renderText({
+  paste("Patient:",
+        as.character(patData[patData$patientId == input$patId, "firstName"]),
         as.character(patData[patData$patientId == input$patId, "name"]),
         "(",
         as.character(patData[patData$patientId == input$patId, "sex"]),
         ")",
         "age:",
         as.character(patData[patData$patientId == input$patId, "age"]) )
-})
-```
-
-Row
------------------------------------------------------------------------
-### Lab results
-```{r}
+}))
 # "prettify" data for output
 combinedData$date <- as_datetime(combinedData$date, 
                                  origin = lubridate::origin, 
