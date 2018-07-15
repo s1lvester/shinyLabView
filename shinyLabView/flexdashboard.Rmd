@@ -9,6 +9,7 @@ runtime: shiny
 
 ```{r global, include=FALSE}
 library(data.table)
+library(dplyr)
 library(DT)
 library(lubridate)
 labData <- read.csv("./dummyValues.csv") # loading data in global needs to be done only once.
@@ -36,13 +37,19 @@ selectInput("patId", label = "Patient",
 Lab Results
 =======================================================================
 ```{r}
+# "prettify" data for output
 combinedData$date <- as_datetime(combinedData$date, 
                                  origin = lubridate::origin, 
-                                 tz = "UTC") # convert int to unixTs-obj.
+                                 tz = "UTC") # convert int to unixTs-obj using lubridate
 combinedData$date <- format(combinedData$date, 
                             format = "%y-%m-%d %H:%M") # convert unixTs to human readable string
+# round to reasonable values (using dplyr)
+combinedData <- mutate_at(combinedData, vars(na, k, krea, hst), funs(round(., 2)))
+combinedData <- mutate_at(combinedData, vars(gfr, hgb, inr), funs(round(., 1)))
+combinedData <- mutate_at(combinedData, vars(gfr, rbc, plt, wbc, ptt), funs(round(., 0)))
 
-displayData <- reactive({ # build a reactive component
+# build a reactive component for DT
+displayData <- reactive({ 
   displayData <- combinedData[combinedData$patientId == input$patId, ] # select by patientId
   displayData <- displayData[order(displayData$date, decreasing = TRUE), ] # sort by date
   rownames(displayData) <- displayData$date # set date as rowname (can't be done earlier, because of likely duplicates)
@@ -50,16 +57,24 @@ displayData <- reactive({ # build a reactive component
   displayData <- t(displayData) # transpose table (in order to get that sweet "Kummulativbericht-feeling")
 })
 
+# render DT output
 DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
-  datatable( # using a seperate datatable-obj. to enable formatRounding.
+  datatable( # using a seperate datatable-obj. to enable formatStyle
     data = displayData(),
     class = "white-space: nowrap", # disable linebreaks: https://github.com/rstudio/DT/issues/353#issuecomment-244509696
+    extensions = "FixedColumns",
     options = list(ordering = FALSE, # ordering makes no sense in a turned table
                    paging = FALSE, # display all avail rows on one site (no problem since table is transposed)
                    searching = FALSE, # disable searchbar
                    bInfo = FALSE, # disable "Showing .. of .. Values"
-                   scrollX = TRUE) # enable horizontal scolling
+                   scrollX = TRUE, # enable horizontal scolling
+                   fixedColumns = TRUE, # fix first column
+                   autoWidth = TRUE, # (https://github.com/rstudio/DT/issues/29#issuecomment-85222039)
+                   columnDefs = list(list(width = "60px", 
+                                          targets = 0)
+                                     )
+                   )
   )
-  %>% formatRound(c(1:999), 2) # see: https://stackoverflow.com/questions/33171279/dt-in-shiny-and-r-custom-number-formatting
+  %>% formatStyle(0, backgroundColor = "lightgrey", fontWeight = "bold") # style first row
 )
 ```
