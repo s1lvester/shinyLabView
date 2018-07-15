@@ -42,7 +42,7 @@ Column {.sidebar}
 # - selectInput takes a named vector to display names coded with an id:
 #   See: http://shiny.rstudio.com/reference/shiny/latest/selectInput.html
 #   and: https://www.dummies.com/programming/r/how-to-name-the-values-in-your-vectors-in-r/
-patData<- patData[order(patData$name), ]
+patData <- patData[order(patData$name), ]
 patSelectors <- patData$patientId
 names(patSelectors) <- paste(as.character(patData$name), 
                              as.character(patData$firstName),
