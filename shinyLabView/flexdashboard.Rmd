@@ -33,7 +33,8 @@ names(patSelectors) <- paste(as.character(patData$name),
                              as.character(patData$firstName),
                              sep = ", ")
 
-selectInput("patId", label = "Patient",
+selectInput("patId", 
+            label = h4("Select Patient:"),
             choices = patSelectors)
 ```
 
