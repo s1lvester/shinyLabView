@@ -2,6 +2,12 @@
 title: "ShinyLabView"
 output: 
   flexdashboard::flex_dashboard:
+<<<<<<< Updated upstream
+    orientation: columns
+    vertical_layout: fill
+=======
+    theme: sandstone
+>>>>>>> Stashed changes
 runtime: shiny
 ---
 
@@ -33,8 +39,27 @@ selectInput("patId", label = "Patient",
             choices = patSelectors)
 ```
 
-Lab Results
+Lab Results {data-orientation=rows}
 =======================================================================
+
+Row
+-----------------------------------------------------------------------
+### Patient-Data
+```{r}
+renderText({
+  paste(as.character(patData[patData$patientId == input$patId, "firstName"]),
+        as.character(patData[patData$patientId == input$patId, "name"]),
+        "(",
+        as.character(patData[patData$patientId == input$patId, "sex"]),
+        ")",
+        "age:",
+        as.character(patData[patData$patientId == input$patId, "age"]) )
+})
+```
+
+Row
+-----------------------------------------------------------------------
+### Lab results
 ```{r}
 # "prettify" data for output
 combinedData$date <- as_datetime(combinedData$date, 

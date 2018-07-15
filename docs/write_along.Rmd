@@ -1,8 +1,7 @@
 ---
 title: "shinyLabView docs"
-output:
-  html_document:
-    df_print: paged
+author: Markus Bockhacker
+output: github_document
 ---
 
 (assorted write-along during programming)
