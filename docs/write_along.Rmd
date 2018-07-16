@@ -1,7 +1,9 @@
 ---
 title: "shinyLabView docs"
 author: Markus Bockhacker
-output: github_document
+output: 
+  github_document:
+    toc: true
 ---
 
 # What?
@@ -19,19 +21,19 @@ Students involved in the project:
 Currently this project has no licence - this will change in the future.
 
 
-## CAVE / BEWARE:
+# CAVE / BEWARE
 this projects uses lab parameters that are familiar to german physicians in clinical practice and therefore are not always proper si-units!
 
-## Input Data
+# Input Data
 comma-separated-values (csv) are read from a file.
 
-#### Lab data
+## Lab data
 ```{r echo=FALSE, results='asis'}
 library(knitr)
 kable(read.csv2("./input_data_structures/lab-Lab results input data structure.csv"))
 ```
 
-#### Lookup table for patient-data
+### Lookup table for patient-data
 comma-separated-values (csv) are read from a file.
 
 ```{r echo=FALSE, results='asis'}
@@ -39,7 +41,7 @@ library(knitr)
 kable(read.csv2("./input_data_structures/patient_lookup-patient data lookup table structure sheet.csv"))
 ```
 
-#### Normal values
+### Normal values
 comma-separated-values (csv) are read from a file.
 Source: http://www.laborlexikon.de/Referenzen.htm
 
@@ -50,7 +52,7 @@ kable(read.csv2("./input_data_structures/norm-Lab results input data structure.c
 
 
 ### Random Datasets to create lab data
-```{r}
+```{r echo=TRUE, eval=FALSE}
 library(lubridate)
 
 store <- list()
@@ -85,7 +87,7 @@ colnames(store) <- c("resultId", "patientId", "date", "na", "k", "krea", "hst", 
 write.csv(store, "../shinyLabView/labData.csv")
 ```
 
-## "internal API"
+# "internal API"
 In order to build a modular program there's need for an internal api or convention on how to call testcases.
 Testcases can either reverence the whole dataset or a subset by patientId and/or date.
 
@@ -96,11 +98,20 @@ Pseudocode:
       return MessageString "result"
     }
 
+# UI & Visualisation
+
 ## datatables.net and DT
 DI is a R Interface to the jQuery Plug-in DataTables (https://rstudio.github.io/DT).
 
-#### Selection and FixedColumns
+### Selection and FixedColumns
 Selection of rows doesn't really work with FixedColumns (https://github.com/rstudio/DT/issues/275#issuecomment-355610296).
 Instead I disabled click-enents via css for fixed table-columns via `pointerEvents = "none"`.
 
-aka: terrible hack.
+aka: terrible hack. See also: https://github.com/s1lvester/shinyLabView/issues/6
+
+### normValues
+NormValues are gender-specific. I used two different variable (Vector "femaleNormValuesCol" and data.frome "femaleNormValues") to store character and numeric values. Characters are bound to the displayData as row number 1, numeric values are appended to the tail of the rowset and thus form the last two rows. Afterwards they can be seperately formated. Numeric values will be hidden after transposing the table (visible = FALSE in columnDefs option) and characters will be styled with CSS.
+
+Since DT doesn't include any helper-functions to style individual cells in rows on conditions and since formatStyle(target = row) always styles the whole row (See: https://rstudio.github.io/DT/010-style.html), Instead I worte a "rowCallback" function, which is just jQuery style JS which executes as every row is rendered.
+
+See: https://datatables.net/reference/option/rowCallback and https://datatables.net/manual/data/

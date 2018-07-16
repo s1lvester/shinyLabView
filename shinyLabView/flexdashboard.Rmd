@@ -15,20 +15,20 @@ patData <- read.csv2("./patientData.csv")
 normValues <- read.csv2("./normValues.csv")
 combinedData <- merge(labData, patData, by = "patientId")
 
-# build normvalues for display later
-femaleNormValues <- c()
-maleNormValues <- c()
+# build normValue-Column Data for main Datatable
+femaleNormValues <- data.frame(normValues$parameter, normValues$female.min, normValues$female.max)
+names(femaleNormValues) <- c("parameter", "min", "max")
+maleNormValues <- data.frame(normValues$parameter, normValues$male.min, normValues$male.max)
+names(maleNormValues) <- c("parameter", "min", "max")
+femaleNormValuesCol <- c()
+maleNormValuesCol <- c()
 for (i in 1:nrow(normValues)) {
-  femaleNormValues <- c(femaleNormValues, paste(as.character(normValues[i, "female.min"]),
-                                                "-",
-                                                as.character(normValues[i, "female.max"]),
-                                                as.character(normValues[i, "unit"]))
-                        )
-  maleNormValues <- c(maleNormValues, paste(as.character(normValues[i, "male.min"]),
-                                            "-",
-                                            as.character(normValues[i, "male.max"]),
-                                            as.character(normValues[i, "unit"]))
-                      )
+  femaleNormValuesCol <- c(femaleNormValuesCol, paste(as.character(normValues[i, "female.min"]), "-",
+                                                      as.character(normValues[i, "female.max"]),
+                                                      as.character(normValues[i, "unit"])))
+  maleNormValuesCol <- c(maleNormValuesCol, paste(as.character(normValues[i, "male.min"]), "-",
+                                                  as.character(normValues[i, "male.max"]),
+                                                  as.character(normValues[i, "unit"])))
 }
 ```
 
@@ -86,11 +86,15 @@ displayData <- reactive({
   rownames(displayData) <- displayData$date # set date as rowname (can't be done earlier, because of likely duplicates)
   displayData <- subset(displayData, select = c(na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt)) # select values (if not done here normValues will be false!)
   
-  # Bind sex-specific normValues to table
+  # Bind gender-specific normValues to table
   if (patData[patData$patientId == input$patId, "sex"] == "f") {
-    displayData <- rbind(femaleNormValues, displayData)
+    displayData <- rbind(femaleNormValuesCol, displayData) # human readable
+    displayData <- rbind(displayData, femaleNormValues$min) # to be hidden later
+    displayData <- rbind(displayData, femaleNormValues$max)
   } else {
-    displayData <- rbind(maleNormValues, displayData)
+    displayData <- rbind(maleNormValuesCol, displayData)
+    displayData <- rbind(displayData, maleNormValues$min)
+    displayData <- rbind(displayData, maleNormValues$max)
   }
   rownames(displayData) <- c("norm", rownames(displayData)[-1]) # replace default rowname
   
@@ -104,16 +108,32 @@ DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
     class = "white-space: nowrap", # disable linebreaks: https://github.com/rstudio/DT/issues/353#issuecomment-244509696
     extensions = c("FixedColumns"),
     selection = list(mode = "single", target = "row"), # https://rstudio.github.io/DT/shiny.html
-    options = list(ordering = FALSE, # ordering makes no sense in a turned table
+    options = list(ordering = FALSE, # ordering makes no sense in a transposed table
                    paging = FALSE, # display all avail rows on one site (no problem since table is transposed)
                    searching = FALSE, # disable searchbar
                    bInfo = FALSE, # disable "Showing .. of .. Values"
                    scrollX = TRUE, # enable horizontal scolling
-                   fixedColumns = list(leftColumns = 2), # fix columns
-                   autoWidth = TRUE) # (https://github.com/rstudio/DT/issues/29#issuecomment-85222039)
+                   fixedColumns = list(leftColumns = 2), # fix columns (rownames + normValuesCol)
+                   autoWidth = TRUE, # (https://github.com/rstudio/DT/issues/29#issuecomment-85222039)
+                   
+                   # Display high/low cell styling
+                   columnDefs = list(list(visible = FALSE, targets = c(-2, -1))), # hide last two columns (normVals specific for gender)
+                   rowCallback = JS( # implement rowCallback to style single rows. See: docs/write_along.Rmd
+                     "function(row, data) {",
+                       "for (var i = 2; i < (data.length - 2); i++) {",
+                         "if (parseFloat(data[i]) < parseFloat(data[(data.length - 2)])) {",
+                           "$('td:eq(' + i + ')', row).html(data[i] + ' (-)');",
+                         "} else if (parseFloat(data[i]) > parseFloat(data[(data.length - 1)])) {",
+                           "$('td:eq(' + i + ')', row).html(data[i] + ' (+)');",
+                         "}",
+                       "}",
+                     "}"
+                   )
+    ),
+    callback = JS("table.draw()") # not strictly nessesary but speeds up drawing on data-change (i.e. switching of patients)
   ) 
   # style Columns
   %>% formatStyle(0, backgroundColor = "lightgrey", fontWeight = "bold", pointerEvents = "none") # see write_along.Rmd regarding pointerEvents = "none"
-  %>% formatStyle(1, backgroundColor = "lightgrey", fontSize = "xx-small", pointerEvents = "none")
+  %>% formatStyle("norm", backgroundColor = "lightgrey", fontSize = "xx-small", pointerEvents = "none")
 )
 ```

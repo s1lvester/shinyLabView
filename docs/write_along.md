@@ -2,6 +2,19 @@ shinyLabView docs
 ================
 Markus Bockhacker
 
+-   [What?](#what)
+-   [CAVE / BEWARE](#cave-beware)
+-   [Input Data](#input-data)
+    -   [Lab data](#lab-data)
+        -   [Lookup table for patient-data](#lookup-table-for-patient-data)
+        -   [Normal values](#normal-values)
+        -   [Random Datasets to create lab data](#random-datasets-to-create-lab-data)
+-   ["internal API"](#internal-api)
+-   [UI & Visualisation](#ui-visualisation)
+    -   [datatables.net and DT](#datatables.net-and-dt)
+        -   [Selection and FixedColumns](#selection-and-fixedcolumns)
+        -   [normValues](#normvalues)
+
 What?
 =====
 
@@ -17,17 +30,18 @@ Students involved in the project:
 
 Currently this project has no licence - this will change in the future.
 
-CAVE / BEWARE:
---------------
+CAVE / BEWARE
+=============
 
 this projects uses lab parameters that are familiar to german physicians in clinical practice and therefore are not always proper si-units!
 
 Input Data
-----------
+==========
 
 comma-separated-values (csv) are read from a file.
 
-#### Lab data
+Lab data
+--------
 
 | Parameter | Data.Type      | Unit               |
 |:----------|:---------------|:-------------------|
@@ -46,7 +60,7 @@ comma-separated-values (csv) are read from a file.
 | inr       | Floating point | no dimension       |
 | ptt       | Floating point | \[sec\]            |
 
-#### Lookup table for patient-data
+### Lookup table for patient-data
 
 comma-separated-values (csv) are read from a file.
 
@@ -58,7 +72,7 @@ comma-separated-values (csv) are read from a file.
 | name      | String          |
 | firstName | String          |
 
-#### Normal values
+### Normal values
 
 comma-separated-values (csv) are read from a file. Source: <http://www.laborlexikon.de/Referenzen.htm>
 
@@ -68,7 +82,7 @@ comma-separated-values (csv) are read from a file. Source: <http://www.laborlexi
 | k         | mmol/l |        3.80|        5.20|      3.80|      5.20|
 | krea      | mg/dl  |        0.66|        1.09|      0.81|      1.44|
 | hst       | mg/dl  |       21.00|       43.00|     18.00|     55.00|
-| gfr       | ml/min |        0.00|      999.00|      0.00|    999.00|
+| gfr       | ml/min |       90.00|      999.00|     90.00|    999.00|
 | hgb       | g/dl   |       12.00|       16.00|     14.00|     18.00|
 | rbc       | mio/ul |        4.30|        5.20|      4.80|      5.90|
 | plt       | tsd/ul |      150.00|      400.00|    150.00|    400.00|
@@ -80,16 +94,7 @@ comma-separated-values (csv) are read from a file. Source: <http://www.laborlexi
 
 ``` r
 library(lubridate)
-```
 
-    ## 
-    ## Attaching package: 'lubridate'
-
-    ## The following object is masked from 'package:base':
-    ## 
-    ##     date
-
-``` r
 store <- list()
 v <- numeric(14)
 k <- 0
@@ -123,7 +128,7 @@ write.csv(store, "../shinyLabView/labData.csv")
 ```
 
 "internal API"
---------------
+==============
 
 In order to build a modular program there's need for an internal api or convention on how to call testcases. Testcases can either reverence the whole dataset or a subset by patientId and/or date.
 
@@ -134,13 +139,24 @@ Pseudocode:
       return MessageString "result"
     }
 
+UI & Visualisation
+==================
+
 datatables.net and DT
 ---------------------
 
 DI is a R Interface to the jQuery Plug-in DataTables (<https://rstudio.github.io/DT>).
 
-#### Selection and FixedColumns
+### Selection and FixedColumns
 
 Selection of rows doesn't really work with FixedColumns (<https://github.com/rstudio/DT/issues/275#issuecomment-355610296>). Instead I disabled click-enents via css for fixed table-columns via `pointerEvents = "none"`.
 
-aka: terrible hack.
+aka: terrible hack. See also: <https://github.com/s1lvester/shinyLabView/issues/6>
+
+### normValues
+
+NormValues are gender-specific. I used two different variable (Vector "femaleNormValuesCol" and data.frome "femaleNormValues") to store character and numeric values. Characters are bound to the displayData as row number 1, numeric values are appended to the tail of the rowset and thus form the last two rows. Afterwards they can be seperately formated. Numeric values will be hidden after transposing the table (visible = FALSE in columnDefs option) and characters will be styled with CSS.
+
+Since DT doesn't include any helper-functions to style individual cells in rows on conditions and since formatStyle(target = row) always styles the whole row (See: <https://rstudio.github.io/DT/010-style.html>), Instead I worte a "rowCallback" function, which is just jQuery style JS which executes as every row is rendered.
+
+See: <https://datatables.net/reference/option/rowCallback> and <https://datatables.net/manual/data/>
