@@ -103,9 +103,9 @@ displayData <- reactive({
 
 # render DT output
 DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
-  datatable( # using a seperate datatable-obj. to enable formatStyle
+  DT::datatable( # using a seperate datatable-obj. to enable formatStyle
     data = displayData(),
-    class = "white-space: nowrap", # disable linebreaks: https://github.com/rstudio/DT/issues/353#issuecomment-244509696
+    class = "hover nowrap cell-border compact", # https://github.com/rstudio/DT/issues/353, https://datatables.net/manual/styling/classes
     extensions = c("FixedColumns"),
     selection = list(mode = "single", target = "row"), # https://rstudio.github.io/DT/shiny.html
     options = list(ordering = FALSE, # ordering makes no sense in a transposed table
@@ -122,9 +122,11 @@ DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
                      "function(row, data) {",
                        "for (var i = 2; i < (data.length - 2); i++) {",
                          "if (parseFloat(data[i]) < parseFloat(data[(data.length - 2)])) {",
-                           "$('td:eq(' + i + ')', row).html(data[i] + ' (-)');",
+                           "$('td:eq(' + i + ')', row).html(data[i] + ' -');",
+                           "$('td:eq(' + i + ')', row).css('background-color', '#e6f2ff');",
                          "} else if (parseFloat(data[i]) > parseFloat(data[(data.length - 1)])) {",
-                           "$('td:eq(' + i + ')', row).html(data[i] + ' (+)');",
+                           "$('td:eq(' + i + ')', row).html(data[i] + ' +');",
+                           "$('td:eq(' + i + ')', row).css('background-color', '#ffebe6');",
                          "}",
                        "}",
                      "}"
