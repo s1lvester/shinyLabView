@@ -3,6 +3,8 @@ title: "ShinyLabView"
 output: 
   flexdashboard::flex_dashboard:
     theme: sandstone
+    orientation: columns
+    vertical_layout: fill
 runtime: shiny
 ---
 
@@ -10,6 +12,8 @@ runtime: shiny
 library(dplyr)
 library(lubridate)
 library(DT)
+library(plotly)
+
 labData <- read.csv("./labData.csv") # loading data in global needs to be done only once.
 patData <- read.csv2("./patientData.csv")
 normValues <- read.csv2("./normValues.csv")
@@ -55,7 +59,7 @@ selectInput("patId",
 
 Row
 -----------------------------------------------------------------------
-### Lab results
+###
 ```{r}
 h4(renderText({
   paste("Patient:",
@@ -67,7 +71,9 @@ h4(renderText({
         "age:",
         as.character(patData[patData$patientId == input$patId, "age"]))
 }))
+```
 
+```{r}
 # "prettify" data for output
 combinedData$date <- as_datetime(combinedData$date, 
                                  origin = lubridate::origin, 
@@ -100,18 +106,27 @@ displayData <- reactive({
   
   displayData <- t(displayData) # transpose table (in order to get that sweet "Kummulativbericht-feeling")
 })
+```
 
+```{r}
 # render DT output
-DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
+DTOutput(outputId = "resultTable")
+output$resultTable <- DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
   DT::datatable( # using a seperate datatable-obj. to enable formatStyle
     data = displayData(),
     class = "hover nowrap cell-border compact", # https://github.com/rstudio/DT/issues/353, https://datatables.net/manual/styling/classes
     extensions = c("FixedColumns"),
     selection = list(mode = "single", target = "row"), # https://rstudio.github.io/DT/shiny.html
-    options = list(ordering = FALSE, # ordering makes no sense in a transposed table
+    options = list(initComplete = JS(
+                     "function(settings, json) {",
+                       "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
+                     "}"
+                   ),
+                   ordering = FALSE, # ordering makes no sense in a transposed table
                    paging = FALSE, # display all avail rows on one site (no problem since table is transposed)
                    searching = FALSE, # disable searchbar
                    bInfo = FALSE, # disable "Showing .. of .. Values"
+                   scrollY = TRUE,
                    scrollX = TRUE, # enable horizontal scolling
                    fixedColumns = list(leftColumns = 2), # fix columns (rownames + normValuesCol)
                    autoWidth = TRUE, # (https://github.com/rstudio/DT/issues/29#issuecomment-85222039)
@@ -139,3 +154,24 @@ DT::renderDataTable( # see: https://rstudio.github.io/DT/options.html
   %>% formatStyle("norm", backgroundColor = "lightgrey", fontSize = "xx-small", pointerEvents = "none")
 )
 ```
+
+Row
+---------------------------------------------------------------------------
+###
+```{r}
+#Plot Output
+plotlyOutput("coursePlot")
+output$coursePlot <- renderPlotly(
+  if (is.null(input$resultTable_rows_selected)) {
+    return(geom_blank()) # https://ggplot2.tidyverse.org/reference/geom_blank.html :-)
+  } else {
+    plot_ly(x = colnames(displayData())[2:(length(colnames(displayData()))-2)],
+            y = displayData()[input$resultTable_rows_selected ,seq(2,41)],
+            type = "scatter",
+            mode = "lines"
+    )
+  }
+)
+```
+
+
