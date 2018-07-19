@@ -165,11 +165,53 @@ output$coursePlot <- renderPlotly(
   if (is.null(input$resultTable_rows_selected)) {
     return(geom_blank()) # https://ggplot2.tidyverse.org/reference/geom_blank.html :-)
   } else {
-    plot_ly(x = colnames(displayData())[2:(length(colnames(displayData())) - 2)],
-            y = displayData()[input$resultTable_rows_selected, seq(2, (length(colnames(displayData())) - 2))],
-            type = "scatter",
-            mode = "lines"
-    )
+      p <- plot_ly(x = ~colnames(displayData())[2:(length(colnames(displayData()))-2)],
+                   y = ~displayData()[input$resultTable_rows_selected, ][length(colnames(displayData()))],
+                   type = "scatter", 
+                   mode = "lines",
+                   line = list(color = "transparent"),
+                   showlegend = FALSE, 
+                   name = "HIGH") %>%
+      add_trace(x = colnames(displayData())[2:(length(colnames(displayData()))-2)],
+                y = displayData()[input$resultTable_rows_selected, ][length(colnames(displayData()))-1],
+                type = "scatter", 
+                mode = "lines",
+                fill = "tonexty", 
+                fillcolor="rgba(0,100,80,0.2)", 
+                line = list(color = "transparent"),
+                showlegend = FALSE, 
+                name = "LOW") %>%
+      add_trace(x = colnames(displayData())[2:(length(colnames(displayData()))-2)],
+                y = displayData()[input$resultTable_rows_selected, 2:(length(colnames(displayData()))-2)],
+                type = "scatter",
+                mode = "lines",
+                line = list(color = "rgba(0,0,0,1)"),
+                name = "VALUE") %>%
+      layout(
+             paper_bgcolor='rgb(255,255,255)',
+             plot_bgcolor='rgb(229,229,229)',
+             xaxis = list(title = "",
+                          gridcolor = "rgb(255,255,255)",
+                          categoryorder = "category descending",
+                          showgrid = FALSE,
+                          showline = FALSE,
+                          showticklabels = TRUE,
+                          tickcolor = "rgb(127,127,127)",
+                          #ticks = "outside",
+                          automargin = TRUE,
+                          zeroline = FALSE),
+             yaxis = list(title = "",
+                          gridcolor = "rgb(255,255,255)",
+                          showgrid = FALSE,
+                          showline = FALSE,
+                          showticklabels = TRUE,
+                          tickcolor = "rgb(127,127,127)",
+                          #ticks = "outside",
+                          zeroline = FALSE)) %>% 
+      config(displayModeBar = FALSE,
+             scrollZoom = FALSE,
+             editable = FALSE) 
+    
   }
 )
 ```
