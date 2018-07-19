@@ -165,8 +165,8 @@ output$coursePlot <- renderPlotly(
   if (is.null(input$resultTable_rows_selected)) {
     return(geom_blank()) # https://ggplot2.tidyverse.org/reference/geom_blank.html :-)
   } else {
-    plot_ly(x = colnames(displayData())[2:(length(colnames(displayData()))-2)],
-            y = displayData()[input$resultTable_rows_selected ,seq(2,41)],
+    plot_ly(x = colnames(displayData())[2:(length(colnames(displayData())) - 2)],
+            y = displayData()[input$resultTable_rows_selected, seq(2, (length(colnames(displayData())) - 2))],
             type = "scatter",
             mode = "lines"
     )
