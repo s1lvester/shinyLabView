@@ -14,6 +14,9 @@ Markus Bockhacker
     -   [datatables.net and DT](#datatables.net-and-dt)
         -   [Selection and FixedColumns](#selection-and-fixedcolumns)
         -   [normValues](#normvalues)
+    -   [Line graph (ggplot2 & plot.ly)](#line-graph-ggplot2-plot.ly)
+        -   [Reversing Time](#reversing-time)
+        -   [De-factorisation](#de-factorisation)
 
 What?
 =====
@@ -145,7 +148,7 @@ UI & Visualisation
 datatables.net and DT
 ---------------------
 
-DI is a R Interface to the jQuery Plug-in DataTables (<https://rstudio.github.io/DT>).
+DT is a R Interface to the jQuery Plug-in DataTables (<https://rstudio.github.io/DT>).
 
 ### Selection and FixedColumns
 
@@ -160,3 +163,20 @@ NormValues are gender-specific. I used two different variable (Vector "femaleNor
 Since DT doesn't include any helper-functions to style individual cells in rows on conditions and since formatStyle(target = row) always styles the whole row (See: <https://rstudio.github.io/DT/010-style.html>), Instead I worte a "rowCallback" function, which is just jQuery style JS which executes as every row is rendered.
 
 See: <https://datatables.net/reference/option/rowCallback> and <https://datatables.net/manual/data/>
+
+Line graph (ggplot2 & plot.ly)
+------------------------------
+
+Line graph is designed using ggplot2 because it's much more flexible with ribbon plots and turned into a plot.ly graphig using ggplotly().
+
+### Reversing Time
+
+Unfortunately "scale\_x\_reverse()" doesn't work with "scale\_x\_datetime()" so it's neccessary to implement a helper-function to reverse the datetime x scale in the plot.
+
+### De-factorisation
+
+When reading files (and parsing them through reactive components in shiny) more often than not you'll recieve a Factor instead of a simple data-type like a Vector. In theory this factor also includes "historical" data on what led to this factors values - but in order to use them in a function that expects a list or vector we need to parse them two times.
+
+    as.numeric(as.character(FACTOR))
+
+According to the docs this is the most inefficient, but most readable way.
