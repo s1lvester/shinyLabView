@@ -4,6 +4,11 @@ output:
   flexdashboard::flex_dashboard:
     theme: sandstone
     vertical_layout: scroll
+    navbar:
+      - { icon: "fa-github", 
+          title: "Source-Code",
+          href: "https://github.com/s1lvester/shinyLabView", 
+          align: right }
 runtime: shiny
 ---
 
