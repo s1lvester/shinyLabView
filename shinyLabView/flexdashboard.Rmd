@@ -3,8 +3,7 @@ title: "ShinyLabView"
 output: 
   flexdashboard::flex_dashboard:
     theme: sandstone
-    orientation: columns
-    vertical_layout: fill
+    vertical_layout: scroll
 runtime: shiny
 ---
 
@@ -12,6 +11,8 @@ runtime: shiny
 library(dplyr)
 library(lubridate)
 library(DT)
+library(scales)
+library(ggplot2)
 library(plotly)
 
 labData <- read.csv("./labData.csv") # loading data in global needs to be done only once.
@@ -36,11 +37,8 @@ for (i in 1:nrow(normValues)) {
 }
 ```
 
-Lab Results {data-orientation=rows}
+Lab Results
 =======================================================================
-
-Column {.sidebar}
------------------------------------------------------------------------
 ```{r}
 # prepare patient selection with helper vector:
 # - selectInput takes a named vector to display names coded with an id:
@@ -48,29 +46,18 @@ Column {.sidebar}
 #   and: https://www.dummies.com/programming/r/how-to-name-the-values-in-your-vectors-in-r/
 patData <- patData[order(patData$name), ]
 patSelectors <- patData$patientId
-names(patSelectors) <- paste(as.character(patData$name), 
+names(patSelectors) <- paste(as.character(patData$name),
+                             ", ",
                              as.character(patData$firstName),
-                             sep = ", ")
+                             "(",
+                             as.character(patData$sex),
+                             ") age:",
+                             as.character(patData$age))
 
 selectInput("patId", 
-            label = h4("Select Patient:"),
+            label = "Select Patient:",
             choices = patSelectors)
-```
 
-Row
------------------------------------------------------------------------
-###
-```{r}
-h4(renderText({
-  paste("Patient:",
-        as.character(patData[patData$patientId == input$patId, "firstName"]),
-        as.character(patData[patData$patientId == input$patId, "name"]),
-        "(",
-        as.character(patData[patData$patientId == input$patId, "sex"]),
-        ")",
-        "age:",
-        as.character(patData[patData$patientId == input$patId, "age"]))
-}))
 ```
 
 ```{r}
@@ -156,64 +143,47 @@ output$resultTable <- DT::renderDataTable( # see: https://rstudio.github.io/DT/o
 ```
 
 Row
----------------------------------------------------------------------------
-###
+-----------------------------------------------------------------------
 ```{r}
 #Plot Output
 plotlyOutput("coursePlot")
 output$coursePlot <- renderPlotly(
   if (is.null(input$resultTable_rows_selected)) {
-    return(geom_blank()) # https://ggplot2.tidyverse.org/reference/geom_blank.html :-)
+    p <- ggplot() + geom_blank()
+    ggplotly(p) %>%
+      config(displayModeBar = FALSE,
+             scrollZoom = FALSE,
+             editable = FALSE) 
   } else {
-      p <- plot_ly(x = ~colnames(displayData())[2:(length(colnames(displayData()))-2)],
-                   y = ~displayData()[input$resultTable_rows_selected, ][length(colnames(displayData()))],
-                   type = "scatter", 
-                   mode = "lines",
-                   line = list(color = "transparent"),
-                   showlegend = FALSE, 
-                   name = "HIGH") %>%
-      add_trace(x = colnames(displayData())[2:(length(colnames(displayData()))-2)],
-                y = displayData()[input$resultTable_rows_selected, ][length(colnames(displayData()))-1],
-                type = "scatter", 
-                mode = "lines",
-                fill = "tonexty", 
-                fillcolor="rgba(0,100,80,0.2)", 
-                line = list(color = "transparent"),
-                showlegend = FALSE, 
-                name = "LOW") %>%
-      add_trace(x = colnames(displayData())[2:(length(colnames(displayData()))-2)],
-                y = displayData()[input$resultTable_rows_selected, 2:(length(colnames(displayData()))-2)],
-                type = "scatter",
-                mode = "lines",
-                line = list(color = "rgba(0,0,0,1)"),
-                name = "VALUE") %>%
-      layout(
-             paper_bgcolor='rgb(255,255,255)',
-             plot_bgcolor='rgb(229,229,229)',
-             xaxis = list(title = "",
-                          gridcolor = "rgb(255,255,255)",
-                          categoryorder = "category descending",
-                          showgrid = FALSE,
-                          showline = FALSE,
-                          showticklabels = TRUE,
-                          tickcolor = "rgb(127,127,127)",
-                          #ticks = "outside",
-                          automargin = TRUE,
-                          zeroline = FALSE),
-             yaxis = list(title = "",
-                          gridcolor = "rgb(255,255,255)",
-                          showgrid = FALSE,
-                          showline = FALSE,
-                          showticklabels = TRUE,
-                          tickcolor = "rgb(127,127,127)",
-                          #ticks = "outside",
-                          zeroline = FALSE)) %>% 
+    # helper function to turn data around (https://groups.google.com/forum/#!topic/ggplot2/qrcvqy6TdzI)
+    c_trans <- function(a, b, breaks = b$breaks, format = b$format) {
+      a <- as.trans(a)
+      b <- as.trans(b)
+      name <- paste(a$name, b$name, sep = "-")
+      trans <- function(x) a$trans(b$trans(x))
+      inv <- function(x) b$inverse(a$inverse(x))
+      trans_new(name, trans, inv, breaks = breaks, format = format)
+    }
+    rev_date <- c_trans("reverse", "time")
+    
+    data <- data.frame(Date = as.POSIXct(ymd_hm(colnames(displayData())[2:(length(colnames(displayData()))-2)])),
+                       Value = as.numeric(as.character(displayData()[input$resultTable_rows_selected, 2:(length(colnames(displayData()))-2)])),
+                       row.names = NULL)
+    p <- ggplot(data, aes(Date, Value)) + 
+      geom_ribbon(aes(ymin = as.numeric(as.character(displayData()[input$resultTable_rows_selected, ][length(colnames(displayData()))-1])),
+                      ymax = as.numeric(as.character(displayData()[input$resultTable_rows_selected, ][length(colnames(displayData()))]))),
+                  fill = "#98FB98") +
+      geom_point(size = 2) +
+      geom_path() +
+      scale_x_continuous(trans = rev_date)
+    
+    ggplotly(p, tooltip = c("x", "y")) %>%
       config(displayModeBar = FALSE,
              scrollZoom = FALSE,
              editable = FALSE) 
     
   }
-)
+) 
 ```
 
 
