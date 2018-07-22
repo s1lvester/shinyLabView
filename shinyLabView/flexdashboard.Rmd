@@ -2,8 +2,8 @@
 title: "ShinyLabView"
 output: 
   flexdashboard::flex_dashboard:
-    theme: sandstone
-    vertical_layout: scroll
+    #theme: sandstone
+    #vertical_layout: scroll
     navbar:
       - { icon: "fa-github", 
           title: "Source-Code",
@@ -82,7 +82,7 @@ displayData <- reactive({
   displayData <- combinedData[combinedData$patientId == input$patId, ] # select by patientId
   displayData <- displayData[order(displayData$date, decreasing = TRUE), ] # sort by date
   rownames(displayData) <- displayData$date # set date as rowname (can't be done earlier, because of likely duplicates)
-  displayData <- subset(displayData, select = c(na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt)) # select values (if not done here normValues will be false!)
+  displayData <- subset(displayData, select = c(na, k, krea, hst, gfr, hgb, rbc, plt, wbc, inr, ptt)) # select values (if not done here normValues will be wrong!)
   
   # Bind gender-specific normValues to table
   if (patData[patData$patientId == input$patId, "sex"] == "f") {
@@ -147,8 +147,10 @@ output$resultTable <- DT::renderDataTable( # see: https://rstudio.github.io/DT/o
 )
 ```
 
-Row
+Column
 -----------------------------------------------------------------------
+&nbsp;
+
 ```{r}
 #Plot Output
 plotlyOutput("coursePlot")
@@ -189,6 +191,40 @@ output$coursePlot <- renderPlotly(
     
   }
 ) 
+```
+
+
+Column
+-----------------------------------------------------------------------
+&nbsp;
+
+```{r}
+# check for slow bleeding (hbg falling over two consecutive datapoints in the past)
+chkSlowBleed <- reactive({
+  data <- displayData()["hgb", -1]
+  dataVector <- as.numeric(as.character(data))
+  
+  for (i in seq(1, length(dataVector)-4)) { # -2 norm values - 2 last values
+    if (i < 2 && dataVector[i] < dataVector[i+1] && dataVector[i+1] < dataVector[i+2] # hgb has been falling for two times
+        ) { 
+      return(HTML(paste(
+        '<div class="alert alert-warning alert-dismissible" role="alert">',
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
+          '<strong>Warning - drop in Haemoglobin-Concentration!</strong><br>',
+          'This patient experienced a drop in hbg between <strong>',
+          names(data[i+2]),
+          '</strong> and <strong>',
+          names(data[i]),
+          '</strong>. This could be a sign of occult gastrointestinal bleeding.',
+        '</div>',
+        sep = ""
+      )))
+    }
+  }
+  return("")
+})
+
+renderUI(chkSlowBleed())
 ```
 
 
