@@ -225,6 +225,25 @@ chkSlowBleed <- reactive({
 })
 
 renderUI(chkSlowBleed())
+
+chkCreaIncrease <- reactive({
+  data <- displayData()["krea", -1]
+  dataVector <- as.numeric(as.character(data))
+  
+  if (max(dataVector) > 3*min(dataVector)) {
+    return(HTML(paste(
+        '<div class="alert alert-warning alert-dismissible" role="alert">',
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
+          '<strong>Warning - rise in Creatinine!</strong><br>',
+          'This patient experienced a high rise in Creatinine. <strong>This is a sign of acute kidney injury.</strong>',
+        '</div>',
+        sep = ""
+      )))
+  }
+  
+})
+
+renderUI(chkCreaIncrease())
 ```
 
 
