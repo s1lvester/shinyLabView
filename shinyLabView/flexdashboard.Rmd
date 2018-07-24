@@ -231,7 +231,7 @@ chkCreaIncrease <- reactive({
   data <- displayData()["krea", -1]
   dataVector <- as.numeric(as.character(data))
   
-  if (max(dataVector) > 3*min(dataVector)) {
+  if (max(dataVector) > 3*min(dataVector) && which.max(dataVector) != length(dataVector)-2) { # exclude drop) {
     return(HTML(paste(
         '<div class="alert alert-warning alert-dismissible" role="alert">',
         '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
