@@ -252,12 +252,19 @@ chkCreaOverFour <- reactive({
   dataVector <- as.numeric(as.character(data))
   
   for (i in seq(1, length(dataVector)-4)) { # -2 norm values - 2 last values
-    if (max(dataVector) > 4 && (dataVector[i+1]-dataVector[i] > 0.5 || dataVector[i+2]-dataVector[i] > 0.5)) { # acute Crea increase meaning from one day to the other or in two days
+    if (max(dataVector) > 4 && (dataVector[i+1]-dataVector[i] > 0.5 || dataVector[i+2]-dataVector[i] > 0.5)) { 
+      # acute Crea increase meaning from one day to the other or in two days
+      # to include timelimit use timedifference using as.numeric(as.POSIXct(names(data[i])))-as.numeric(as.POSIXct(names(data[i+2]))),
       return(HTML(paste(
           '<div class="alert alert-warning alert-dismissible" role="alert">',
-          '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
+            '<span aria-hidden="true">&times;</span></button>',
             '<strong>Warning - rise in Creatinine!</strong><br>',
-            'This patient experienced an acute rise in Creatinine over 4 mg/dl. <strong>This is a sign of acute kidney injury.</strong>',
+            'This patient experienced an acute rise in Creatinine between <strong>',
+            names(data[i+2]),
+            '</strong> and <strong>',
+            names(data[i]),
+            '</strong> over 4 mg/dl.   <strong>This is a sign of acute kidney injury.</strong>',
           '</div>',
         sep = ""
       )))
