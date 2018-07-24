@@ -226,6 +226,7 @@ chkSlowBleed <- reactive({
 
 renderUI(chkSlowBleed())
 
+# check for Creatinine increase by 3-fold
 chkCreaIncrease <- reactive({
   data <- displayData()["krea", -1]
   dataVector <- as.numeric(as.character(data))
@@ -244,6 +245,27 @@ chkCreaIncrease <- reactive({
 })
 
 renderUI(chkCreaIncrease())
+
+# check for acute Creatinine increase over 4 mg/dl 
+chkCreaOverFour <- reactive({
+  data <- displayData()["krea", -1]
+  dataVector <- as.numeric(as.character(data))
+  
+  for (i in seq(1, length(dataVector)-4)) { # -2 norm values - 2 last values
+    if (max(dataVector) > 4 && (dataVector[i+1]-dataVector[i] > 0.5 || dataVector[i+2]-dataVector[i] > 0.5)) { # acute Crea increase meaning from one day to the other or in two days
+      return(HTML(paste(
+          '<div class="alert alert-warning alert-dismissible" role="alert">',
+          '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
+            '<strong>Warning - rise in Creatinine!</strong><br>',
+            'This patient experienced an acute rise in Creatinine over 4 mg/dl. <strong>This is a sign of acute kidney injury.</strong>',
+          '</div>',
+        sep = ""
+      )))
+  }
+}
+})
+
+renderUI(chkCreaOverFour())
 ```
 
 
