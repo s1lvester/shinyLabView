@@ -203,7 +203,7 @@ Column
 chkSlowBleed <- reactive({
   data <- displayData()["hgb", -1]
   dataVector <- as.numeric(as.character(data))
-  dataVector <- dataVector[1:(length(dataVector)-2)] # remove norm values from dataVector 
+  dataVector <- dataVector[2:(length(dataVector)-2)] # remove norm values from dataVector 
   
   for (i in seq(1, length(dataVector)-4)) { # -2 norm values - 2 last values
     if (i < 2 && dataVector[i] < dataVector[i+1] && dataVector[i+1] < dataVector[i+2] # hgb has been falling for two times
@@ -231,7 +231,7 @@ renderUI(chkSlowBleed())
 chkCreaIncrease <- reactive({
   data <- displayData()["krea", -1]
   dataVector <- as.numeric(as.character(data))
-  dataVector <- dataVector[1:(length(dataVector)-2)] # remove norm values from dataVector 
+  dataVector <- dataVector[2:(length(dataVector)-2)] # remove norm values from dataVector 
   
   if (max(dataVector) > 3*min(dataVector) && which.max(dataVector) != length(dataVector)-2) { # exclude drop
     return(HTML(paste(
@@ -252,7 +252,7 @@ renderUI(chkCreaIncrease())
 chkCreaOverFour <- reactive({
   data <- displayData()["krea", -1]
   dataVector <- as.numeric(as.character(data))
-  dataVector <- dataVector[1:(length(dataVector)-2)] # remove norm values from dataVector 
+  dataVector <- dataVector[2:(length(dataVector)-2)] # remove norm values from dataVector 
   
   for (i in seq(1, length(dataVector)-4)) { # -2 norm values - 2 last values
     if (max(dataVector) > 4 && (dataVector[i]-dataVector[i+1] > 0.5 || dataVector[i]-dataVector[i+2] > 0.5)) { 
@@ -281,7 +281,7 @@ renderUI(chkCreaOverFour())
 chkGFRdrop <- reactive({
   data <- displayData()["gfr", -1]
   dataVector <- as.numeric(as.character(data))
-  dataVector <- dataVector[1:(length(dataVector)-2)] # remove norm values from dataVector 
+  dataVector <- dataVector[2:(length(dataVector)-2)] # remove norm values from dataVector 
   
   if (min(dataVector) < 0.25*max(dataVector) && which.min(dataVector) != length(dataVector)-2) { # exclude rise
     return(HTML(paste(
@@ -302,7 +302,7 @@ renderUI(chkGFRdrop())
 chkHITprob <- reactive({
   data <- displayData()["plt", -1]
   dataVector <- as.numeric(as.character(data))
-  dataVector <- dataVector[1:(length(dataVector)-2)] # remove norm values from dataVector 
+  dataVector <- dataVector[2:(length(dataVector)-2)] # remove norm values from dataVector 
   HITscore <- 0
     if(((max(dataVector) - min(dataVector) <= 0.5*max(dataVector) && (max(dataVector) - min(dataVector) > 0.3*max(dataVector)) || (min(dataVector) > 10 && min(dataVector) < 19)))) {
     HITscore <- HITscore+1
