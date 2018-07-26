@@ -304,7 +304,6 @@ chkHITprob <- reactive({
   dataVector <- as.numeric(as.character(data))
   dataVector <- dataVector[1:(length(dataVector)-2)] # remove norm values from dataVector 
   HITscore <- 0
-  View(dataVector)
     if(((max(dataVector) - min(dataVector) <= 0.5*max(dataVector) && (max(dataVector) - min(dataVector) > 0.3*max(dataVector)) || (min(dataVector) > 10 && min(dataVector) < 19)))) {
     HITscore <- HITscore+1
   }
