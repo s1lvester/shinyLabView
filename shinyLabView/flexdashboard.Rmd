@@ -20,7 +20,7 @@ library(scales)
 library(ggplot2)
 library(plotly)
 
-labData <- read.csv("./labData.csv") # loading data in global needs to be done only once.
+labData <- read.csv("./labData-Tests-norm.csv") # loading data in global needs to be done only once.
 patData <- read.csv2("./patientData.csv")
 normValues <- read.csv2("./normValues.csv")
 combinedData <- merge(labData, patData, by = "patientId")
@@ -203,6 +203,7 @@ Column
 chkSlowBleed <- reactive({
   data <- displayData()["hgb", -1]
   dataVector <- as.numeric(as.character(data))
+  dataVector <- dataVector[2:(length(dataVector)-2)] # remove norm values from dataVector 
   
   for (i in seq(1, length(dataVector)-4)) { # -2 norm values - 2 last values
     if (i < 2 && dataVector[i] < dataVector[i+1] && dataVector[i+1] < dataVector[i+2] # hgb has been falling for two times
@@ -225,6 +226,116 @@ chkSlowBleed <- reactive({
 })
 
 renderUI(chkSlowBleed())
+
+# check for Creatinine increase by 3-fold
+chkCreaIncrease <- reactive({
+  data <- displayData()["krea", -1]
+  dataVector <- as.numeric(as.character(data))
+  dataVector <- dataVector[2:(length(dataVector)-2)] # remove norm values from dataVector 
+  
+  if (max(dataVector) > 3*min(dataVector) && which.max(dataVector) != length(dataVector)-2) { # exclude drop
+    return(HTML(paste(
+        '<div class="alert alert-warning alert-dismissible" role="alert">',
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
+          '<strong>Warning - rise in Creatinine!</strong><br>',
+          'This patient experienced a 3-fold rise in Creatinine. <strong>This is a sign of acute kidney injury.</strong>',
+        '</div>',
+        sep = ""
+      )))
+  }
+  
+})
+
+renderUI(chkCreaIncrease())
+
+# check for acute Creatinine increase over 4 mg/dl 
+chkCreaOverFour <- reactive({
+  data <- displayData()["krea", -1]
+  dataVector <- as.numeric(as.character(data))
+  dataVector <- dataVector[2:(length(dataVector)-2)] # remove norm values from dataVector 
+  
+  for (i in seq(1, length(dataVector)-4)) { # -2 norm values - 2 last values
+    if (max(dataVector) > 4 && (dataVector[i]-dataVector[i+1] > 0.5 || dataVector[i]-dataVector[i+2] > 0.5)) { 
+      # acute Crea increase meaning from one day to the other or in two days
+      # to include timelimit use timedifference using as.numeric(as.POSIXct(names(data[i])))-as.numeric(as.POSIXct(names(data[i+2]))),
+      return(HTML(paste(
+          '<div class="alert alert-warning alert-dismissible" role="alert">',
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
+            '<span aria-hidden="true">&times;</span></button>',
+            '<strong>Warning - rise in Creatinine!</strong><br>',
+            'This patient experienced an acute rise in Creatinine between <strong>',
+            names(data[i+2]),
+            '</strong> and <strong>',
+            names(data[i]),
+            '</strong> over 4 mg/dl.   <strong>This is a sign of acute kidney injury.</strong>',
+          '</div>',
+        sep = ""
+      )))
+  }
+}
+})
+
+renderUI(chkCreaOverFour())
+
+# check for GFR drop >75%
+chkGFRdrop <- reactive({
+  data <- displayData()["gfr", -1]
+  dataVector <- as.numeric(as.character(data))
+  dataVector <- dataVector[2:(length(dataVector)-2)] # remove norm values from dataVector 
+  
+  if (min(dataVector) < 0.25*max(dataVector) && which.min(dataVector) != length(dataVector)-2) { # exclude rise
+    return(HTML(paste(
+        '<div class="alert alert-warning alert-dismissible" role="alert">',
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
+          '<strong>Warning - drop in GFR!</strong><br>',
+          'This patient experienced a >75% drop in Glomerular Filtration Rate. <strong>This is a sign of kidney injury.</strong>',
+        '</div>',
+        sep = ""
+      )))
+  }
+  
+})
+
+renderUI(chkGFRdrop())
+
+# check for HIT probability
+chkHITprob <- reactive({
+  data <- displayData()["plt", -1]
+  dataVector <- as.numeric(as.character(data))
+  dataVector <- dataVector[2:(length(dataVector)-2)] # remove norm values from dataVector 
+  HITscore <- 0
+    if(((max(dataVector) - min(dataVector) <= 0.5*max(dataVector) && (max(dataVector) - min(dataVector) > 0.3*max(dataVector)) || (min(dataVector) > 10 && min(dataVector) < 19)))) {
+    HITscore <- HITscore+1
+  }
+  
+  if((max(dataVector) - min(dataVector) > 0.5*max(dataVector)) || (min(dataVector) > 20 && min(dataVector) < 100)) {
+    HITscore <- HITscore+2
+  }
+  
+  if(HITscore == 1) {
+    return(HTML(paste(
+        '<div class="alert alert-warning alert-dismissible" role="alert">',
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
+          '<strong>Warning - Patient\'s platelet levels dropped!</strong><br>',
+          'Heparin-induced thrombocytopenia (HIT)-probability: <strong>Moderate</strong>.',
+        '</div>',
+        sep = ""
+      )))
+  }
+  
+  if(HITscore == 2) {
+    return(HTML(paste(
+        '<div class="alert alert-warning alert-dismissible" role="alert">',
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
+          '<strong>Warning - Patient\'s platelet levels dropped!</strong><br>',
+          'Heparin-induced thrombocytopenia (HIT)-probability: <strong>High</strong>.',
+        '</div>',
+        sep = ""
+      )))
+  }
+})
+
+renderUI(chkHITprob())
+
+
 ```
-
-
