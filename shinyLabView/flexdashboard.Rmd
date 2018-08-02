@@ -336,6 +336,10 @@ chkHITprob <- reactive({
 })
 
 renderUI(chkHITprob())
-
-
 ```
+
+
+User Manual
+=======================================================================
+
+click [here](./manual.pdf) to download the german version of the user manual.
