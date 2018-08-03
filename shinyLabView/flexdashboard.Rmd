@@ -216,7 +216,8 @@ chkSlowBleed <- reactive({
           names(data[i+2]),
           '</strong> and <strong>',
           names(data[i]),
-          '</strong>. This could be a sign of occult gastrointestinal bleeding.',
+          '</strong>. This could be a sign of occult gastrointestinal bleeding. ',
+          'Further information: <a target="_blank" rel="noopener noreferrer" href="https://www.awmf.org/leitlinien/detail/ll/021-028.html">see Guideline</a>',
         '</div>',
         sep = ""
       )))
@@ -238,7 +239,12 @@ chkCreaIncrease <- reactive({
         '<div class="alert alert-warning alert-dismissible" role="alert">',
         '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
           '<strong>Warning - rise in Creatinine!</strong><br>',
-          'This patient experienced a 3-fold rise in Creatinine. <strong>This is a sign of acute kidney injury.</strong>',
+          'This patient experienced a 3-fold rise in Creatinine. ',
+          'This is a sign of <strong>acute kidney injury (AKI)</strong> according to the ',
+            '<a target="_blank" rel="noopener noreferrer" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5094385/">RIFLE criteria</a>.<br> ',
+            'Further information: see AKI Guideline ',
+            '<a target="_blank" rel="noopener noreferrer" href="https://kdigo.org/wp-content/uploads/2016/10/KDIGO-2012-AKI-Guideline-English.pdf">(English)</a> ',
+            '<a target="_blank" rel="noopener noreferrer" href="https://link.springer.com/article/10.1007%2Fs11560-013-0752-1">(German)</a>',
         '</div>',
         sep = ""
       )))
@@ -267,7 +273,12 @@ chkCreaOverFour <- reactive({
             names(data[i+2]),
             '</strong> and <strong>',
             names(data[i]),
-            '</strong> over 4 mg/dl.   <strong>This is a sign of acute kidney injury.</strong>',
+            '</strong> over 4 mg/dl. <br>',
+            'This is a sign of <strong>acute kidney injury (AKI)</strong> according to the ',
+            '<a target="_blank" rel="noopener noreferrer" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5094385/">RIFLE criteria</a>.<br> ',
+            'Further information: see AKI Guideline ',
+            '<a target="_blank" rel="noopener noreferrer" href="https://kdigo.org/wp-content/uploads/2016/10/KDIGO-2012-AKI-Guideline-English.pdf">(English)</a> ',
+            '<a target="_blank" rel="noopener noreferrer" href="https://link.springer.com/article/10.1007%2Fs11560-013-0752-1">(German)</a>',
           '</div>',
         sep = ""
       )))
@@ -288,7 +299,12 @@ chkGFRdrop <- reactive({
         '<div class="alert alert-warning alert-dismissible" role="alert">',
         '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
           '<strong>Warning - drop in GFR!</strong><br>',
-          'This patient experienced a >75% drop in Glomerular Filtration Rate. <strong>This is a sign of kidney injury.</strong>',
+          'This patient experienced a >75% drop in Glomerular Filtration Rate. ',
+          'This is a sign of <strong>acute kidney injury (AKI)</strong> according to the ',
+          '<a target="_blank" rel="noopener noreferrer" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5094385/">RIFLE criteria</a>.<br> ',
+          'Further information: see AKI Guideline ',
+          '<a target="_blank" rel="noopener noreferrer" href="https://kdigo.org/wp-content/uploads/2016/10/KDIGO-2012-AKI-Guideline-English.pdf">(English)</a> ',
+          '<a target="_blank" rel="noopener noreferrer" href="https://link.springer.com/article/10.1007%2Fs11560-013-0752-1">(German)</a>',
         '</div>',
         sep = ""
       )))
@@ -317,7 +333,8 @@ chkHITprob <- reactive({
         '<div class="alert alert-warning alert-dismissible" role="alert">',
         '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
           '<strong>Warning - Patient\'s platelet levels dropped!</strong><br>',
-          'Heparin-induced thrombocytopenia (HIT)-probability: <strong>Moderate</strong>.',
+          'Heparin-induced thrombocytopenia (HIT)-probability: <strong>Moderate</strong>.<br>',
+          'Further information: <a target="_blank" rel="noopener noreferrer" href="http://circ.ahajournals.org/content/110/18/e454.full">4-T scoring system</a>',
         '</div>',
         sep = ""
       )))
@@ -328,7 +345,8 @@ chkHITprob <- reactive({
         '<div class="alert alert-warning alert-dismissible" role="alert">',
         '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
           '<strong>Warning - Patient\'s platelet levels dropped!</strong><br>',
-          'Heparin-induced thrombocytopenia (HIT)-probability: <strong>High</strong>.',
+          'Heparin-induced thrombocytopenia (HIT)-probability: <strong>High</strong>.<br>',
+          'Further information: <a target="_blank" rel="noopener noreferrer" href="http://circ.ahajournals.org/content/110/18/e454.full">4-T scoring system</a>',
         '</div>',
         sep = ""
       )))
@@ -342,4 +360,4 @@ renderUI(chkHITprob())
 User Manual
 =======================================================================
 
-click [here](./manual.pdf) to download the german version of the user manual.
+click [here](./manual.pdf) to download the German version of the user manual.
