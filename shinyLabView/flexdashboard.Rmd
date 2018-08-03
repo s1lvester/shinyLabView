@@ -19,6 +19,7 @@ library(DT)
 library(scales)
 library(ggplot2)
 library(plotly)
+library(htmltools)
 
 labData <- read.csv("./labData-Tests-norm.csv") # loading data in global needs to be done only once.
 patData <- read.csv2("./patientData.csv")
@@ -342,4 +343,6 @@ renderUI(chkHITprob())
 User Manual
 =======================================================================
 
-click [here](./manual.pdf) to download the german version of the user manual.
+```{r, echo=FALSE}
+htmltools::includeHTML("manual.htm")
+```
