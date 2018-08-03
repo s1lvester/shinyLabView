@@ -361,6 +361,6 @@ renderUI(chkHITprob())
 User Manual
 =======================================================================
 
-htmltools::includeHTML("manual.htm")
 ```{r, echo=FALSE}
+htmltools::includeHTML("manual.htm")
 ```
